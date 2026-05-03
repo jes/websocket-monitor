@@ -30,5 +30,7 @@ A minimal Firefox WebExtension that:
   - `ON` while capture is enabled.
   - a brief `●` flash when traffic is seen.
 - Captures include direction (`inbound`/`outbound`), page URL, socket URL, timestamp, and payload.
+- Text payload captures include `payloadLength` so you can verify full frame size.
 - Binary payloads are serialized as base64.
 - Blob payloads are recorded as metadata (`type`, `size`) in this basic version.
+- Large text frames are chunked between content script and background to avoid extension message-size limits, then reassembled before export.

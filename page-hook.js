@@ -8,6 +8,7 @@
   const PAGE_CONTROL_EVENT_NAME = "__WS_MONITOR_CONTROL__";
   const NativeWebSocket = window.WebSocket;
   const nativeSend = NativeWebSocket.prototype.send;
+  const monitoredSockets = new WeakSet();
 
   let captureEnabled = true;
 
@@ -79,15 +80,25 @@
     });
   }
 
+  function ensureInboundListener(ws, fallbackUrl) {
+    if (!ws || monitoredSockets.has(ws)) {
+      return;
+    }
+
+    ws.addEventListener("message", (event) => {
+      capture("inbound", ws.url || fallbackUrl || null, event.data);
+    });
+
+    monitoredSockets.add(ws);
+  }
+
   function PatchedWebSocket(url, protocols) {
     const ws =
       arguments.length > 1
         ? new NativeWebSocket(url, protocols)
         : new NativeWebSocket(url);
 
-    ws.addEventListener("message", (event) => {
-      capture("inbound", ws.url || url, event.data);
-    });
+    ensureInboundListener(ws, url);
 
     return ws;
   }
@@ -96,6 +107,8 @@
   Object.setPrototypeOf(PatchedWebSocket, NativeWebSocket);
 
   NativeWebSocket.prototype.send = function patchedSend(data) {
+    // Helps attach inbound capture for sockets that existed before hook injection.
+    ensureInboundListener(this, this.url || null);
     capture("outbound", this.url, data);
     return nativeSend.apply(this, arguments);
   };
