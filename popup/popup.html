@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebSocket Capture Monitor</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main>
+      <h1>WebSocket Capture</h1>
+      <p id="status-line">Status: inactive</p>
+      <p id="count-line">Captured frames: 0</p>
+      <p id="refresh-note" class="hint" hidden>
+        Capture is active. Refresh pages you want to monitor so the hook can attach.
+      </p>
+
+      <div class="controls">
+        <button id="toggle-button" type="button">Enable capture</button>
+        <button id="export-button" type="button">Export JSON</button>
+        <button id="clear-button" type="button">Clear memory</button>
+      </div>
+
+      <p id="message-line" class="hint"></p>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
